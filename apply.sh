@@ -1,1 +1,1 @@
-git config --local commit.template ~/.gitmesage.txt
+git config --local commit.template .gitmessage.txt
