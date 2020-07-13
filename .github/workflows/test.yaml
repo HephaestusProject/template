@@ -31,6 +31,11 @@ jobs:
 
     - name: Test
       run: echo "Test"
+
+    - name: Black Code Formatter
+      uses: lgeiger/black-action@v1.0.1
+      with:
+        args: ". --check"
    
     - name: Slack-Notification
       uses: 8398a7/action-slack@v2.6.0
