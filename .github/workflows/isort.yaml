@@ -31,7 +31,7 @@ jobs:
     - uses: actions/checkout@v1
 
     - name: Prerequeist
-      run: pip3 install black --no-cache --user
+      run: pip3 install isort --no-cache --user
 
     - name: isort
       run: python3 -m isort .
