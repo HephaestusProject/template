@@ -1,0 +1,47 @@
+name: auto-black
+on:
+  pull_request:
+    branches:
+      - master
+      - develop
+    types:
+      - opened
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version:
+          - 3.x
+    timeout-minutes: 60
+
+    steps:
+      - uses: actions/checkout@v1
+
+      - name: Prerequeist
+        run: |
+          pip3 install black --no-cache --user
+
+      - name: Check black & Commit
+        run: |
+          python3 -m black .
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add -A && git diff-index --cached --quiet HEAD || git commit -m 'fix: black'
+
+      - name: Push
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ github.head_ref}}
+
+      - name: Slack-Notification
+        uses: 8398a7/action-slack@v2.6.0
+        with:
+          status: ${{job.status}}
+          fields: repo,message,commit,author,action,eventName,ref,workflow
+          author_name: Auto-Black 알리미
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # required
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }} # required
+        if: always()
