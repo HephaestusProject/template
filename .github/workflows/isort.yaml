@@ -1,0 +1,52 @@
+# This is a basic workflow to help you get started with Actions
+
+name: isort
+
+# Controls when the action will run. Triggers the workflow on push or pull request
+# events but only for the master branch
+on:
+  pull_request:
+    branches: 
+      - master
+      - develop
+    types:
+      - closed
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  format:
+
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    # The type of runner that the job will run on
+    timeout-minutes: 60
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+    # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+    - uses: olance/isort-action@v1.0.0
+      with:
+        args: .
+
+    - name: Commit change
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add -A && git diff-index --cached --quiet HEAD || git commit -m 'fix: isort'
+
+    - name: Push
+      run: ad-m/github-push-action@v0.5.0
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Slack-Notification
+      uses: 8398a7/action-slack@v2.6.0
+      with:
+        status: ${{job.status}}
+        fields: repo,message,commit,author,action,eventName,ref,workflow
+        author_name: isort 알리미
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # required
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }} # required
+      if: always()
