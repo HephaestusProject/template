@@ -1,0 +1,37 @@
+name: pytest
+on:
+  pull_request:
+    branches:
+      - master
+      - develop
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version:
+          - 3.x
+    timeout-minutes: 60
+
+    steps:
+      - uses: actions/checkout@v1
+
+      - name: Prerequeist
+        run: |
+          pip3 install pytest --no-cache --user
+          pip3 install -r requirements.txt
+
+      - name: pytest
+        run: python3 -m pytest tests/*
+
+      - name: Slack-Notification
+        uses: 8398a7/action-slack@v2.6.0
+        with:
+          status: ${{job.status}}
+          fields: repo,message,commit,author,action,eventName,ref,workflow
+          author_name: Pytest 알리미
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # required
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }} # required
+        if: always()
