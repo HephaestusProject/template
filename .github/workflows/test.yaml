@@ -69,34 +69,46 @@ jobs:
         branch: ${{ github.head_ref}}
 
   black:
-    - name: Prerequeist 
-      run: |
-        pip3 install black --no-cache --user
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version:
+          - 3.x
+    timeout-minutes: 60
 
-    - name: apply black
-      run: python3 -m black .
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+    # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
 
-    - name: commit
-      run: |
-        git pull origin ${{ github.head_ref}}
-        git config --local user.email "action@github.com"
-        git config --local user.name "GitHub Action"
-        git add -A && git diff-index --cached --quiet HEAD || git commit -m 'style: black'
+      - name: Prerequeist 
+        run: |
+          pip3 install black --no-cache --user
+
+      - name: apply black
+        run: python3 -m black .
+
+      - name: commit
+        run: |
+          git pull origin ${{ github.head_ref}}
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add -A && git diff-index --cached --quiet HEAD || git commit -m 'style: black'
    
-    - name: push
-      uses: ad-m/github-push-action@v0.5.0
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        branch: ${{ github.head_ref}}
+      - name: push
+        uses: ad-m/github-push-action@v0.5.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ github.head_ref}}
 
-    - name: Slack-Notification
-      uses: 8398a7/action-slack@v2.6.0
-      with:
-        status: ${{job.status}}
-        fields: repo,message,commit,author,action,eventName,ref,workflow
-        author_name: PR Notification
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # required
-        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }} # required
-      if: always()
+      - name: Slack-Notification
+        uses: 8398a7/action-slack@v2.6.0
+        with:
+          status: ${{job.status}}
+          fields: repo,message,commit,author,action,eventName,ref,workflow
+          author_name: PR Notification
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # required
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }} # required
+        if: always()
 
