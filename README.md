@@ -1,8 +1,5 @@
 # base
-![GitHub issues](https://img.shields.io/github/issues-raw/HephaestusProject/template)
-![GitHub closed issues](https://img.shields.io/github/issues-closed-raw/HephaestusProject/template)
-![GitHub pull requests](https://img.shields.io/github/issues-pr-raw/HephaestusProject/template)
-![GitHub closed pull requests](https://img.shields.io/github/issues-pr-closed-raw/HephaestusProject/template)
+[![Code Coverage](https://codecov.io/gh/HephaestusProject/template/branch/master/graph/badge.svg)](https://codecov.io/gh/HephaestusProject/template)
 ## Abstract
 - abstract를 번역해서 넣어주세요.
 ## Table
