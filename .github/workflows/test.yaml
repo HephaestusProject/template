@@ -13,7 +13,7 @@ on:
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   # This workflow contains a single job called "build"
-  build:
+  pytest:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
     strategy:
@@ -29,18 +29,51 @@ jobs:
 
     - name: Prerequeist 
       run: |
-        pip3 install black --no-cache --user
-        pip3 install isort --no-cache --user
         pip3 install pytest pytest-cov --no-cache --user
         pip3 install -r requirements.txt --user
 
     - name: pytest
       run: python3 -m pytest --cov=./ tests/*
 
+  isort:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version:
+          - 3.x
+    timeout-minutes: 60
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+    # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+    - uses: actions/checkout@v2
+
+    - name: Prerequeist 
+      run: |
+        pip3 install isort --no-cache --user
+
     - name: isort
       run: python3 -m isort .
 
-    - name: black
+    - name: commit
+      run: |
+        git pull origin ${{ github.head_ref}}
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add -A && git diff-index --cached --quiet HEAD || git commit -m 'style: isort'
+   
+    - name: push
+      uses: ad-m/github-push-action@v0.5.0
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        branch: ${{ github.head_ref}}
+
+  black:
+    - name: Prerequeist 
+      run: |
+        pip3 install black --no-cache --user
+
+    - name: apply black
       run: python3 -m black .
 
     - name: commit
@@ -48,7 +81,7 @@ jobs:
         git pull origin ${{ github.head_ref}}
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
-        git add -A && git diff-index --cached --quiet HEAD || git commit -m 'style: isort/black'
+        git add -A && git diff-index --cached --quiet HEAD || git commit -m 'style: black'
    
     - name: push
       uses: ad-m/github-push-action@v0.5.0
@@ -61,8 +94,9 @@ jobs:
       with:
         status: ${{job.status}}
         fields: repo,message,commit,author,action,eventName,ref,workflow
-        author_name: 테스트 알리미
+        author_name: PR Notification
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # required
         SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }} # required
       if: always()
+
