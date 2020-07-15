@@ -30,6 +30,7 @@ jobs:
         fetch-depth: 2
     - run: git checkout HEAD^
 
+    
     - name: Prerequeist 
       run: |
         pip3 install pytest pytest-cov --no-cache --user
@@ -37,27 +38,33 @@ jobs:
         pip3 install isort --no-cache --user
         pip3 install -r requirements.txt --user
 
+    
     - name: test with pytest
       run: python3 -m pytest --cov=./ tests/*
 
+    
     - name: apply isort
       run: python3 -m isort .
 
+    
     - name: apply black
       run: python3 -m black .
 
+    
     - name: commit
       run: |
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
         git add -A && git diff-index --cached --quiet HEAD || git commit -m 'style: black'
    
+    
     - name: push
       uses: ad-m/github-push-action@v0.5.0
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         branch: ${{ github.head_ref}}
 
+    
     - name: Slack-Notification
       uses: 8398a7/action-slack@v2.6.0
       with:
