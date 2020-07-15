@@ -57,7 +57,6 @@ jobs:
 
     - name: commit
       run: |
-        git pull origin ${{ github.head_ref}}
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
         git add -A && git diff-index --cached --quiet HEAD || git commit -m 'style: isort'
@@ -90,7 +89,6 @@ jobs:
 
       - name: commit
         run: |
-          git pull origin ${{ github.head_ref}}
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add -A && git diff-index --cached --quiet HEAD || git commit -m 'style: black'
