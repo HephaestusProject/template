@@ -34,14 +34,14 @@ jobs:
         pip3 install pytest pytest-cov --no-cache --user
         pip3 install -r requirements.txt --user
 
+    - name: pytest
+      run: python3 -m pytest --cov=./ tests/*
+
     - name: isort
       run: python3 -m isort .
 
     - name: black
       run: python3 -m black .
-
-    - name: pytest
-      run: python3 -m pytest --cov=./ tests/*
 
     - name: commit
       run: |
