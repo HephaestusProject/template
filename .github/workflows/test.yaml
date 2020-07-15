@@ -38,10 +38,15 @@ jobs:
         pip3 install isort --no-cache --user
         pip3 install -r requirements.txt --user
 
-    
     - name: test with pytest
-      run: python3 -m pytest --cov=./ tests/*
-
+      run: python3 -m pytest --cov-report=xml --cov=./ tests/*
+    
+    - name: upload coverage to codecov
+      uses: codecov/codecov-action@v1.0.10
+      with: 
+        file: ./coverage.xml
+        flags: tests
+        fail_ci_if_error: true
     
     - name: apply isort
       run: python3 -m isort .
