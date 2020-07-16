@@ -56,7 +56,7 @@ jobs:
               with:
                   status: ${{job.status}}
                   fields: repo,message,commit,author,action,eventName,ref,workflow
-                  author_name: PR Notification
+                  author_name: Lint Notification
               env:
                   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # required
                   SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }} # required
