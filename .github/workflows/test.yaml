@@ -25,11 +25,21 @@ jobs:
         steps:
             # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
             - uses: actions/checkout@v2
+              with:
+                  ref: ${{ github.event.pull_request.head.sha }}
 
             - name: Prerequeist
               run: |
+                  pip3 install black --no-cache --user
+                  pip3 install isort --no-cache --user
                   pip3 install pytest pytest-cov --no-cache --user
                   pip3 install -r requirements.txt --user
+
+            - name: apply isort
+              run: python3 -m isort .
+
+            - name: apply black
+              run: python3 -m black .
 
             - name: test with pytest
               run: python3 -m pytest --cov-report=xml --cov=./ tests/*
@@ -40,6 +50,18 @@ jobs:
                   file: ./coverage.xml
                   flags: tests
                   fail_ci_if_error: true
+
+            - name: commit
+              run: |
+                  git config --local user.email "action@github.com"
+                  git config --local user.name "GitHub Action"
+                  git add -A && git diff-index --cached --quiet HEAD || git commit -m 'style: isort/black'
+
+            - name: push
+              uses: ad-m/github-push-action@master
+              with:
+                  github_token: ${{ secrets.GITHUB_TOKEN }}
+                  branch: ${{ github.head_ref }}
 
             - name: Slack-Notification
               uses: 8398a7/action-slack@v2.6.0
