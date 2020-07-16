@@ -24,6 +24,7 @@ jobs:
               uses: abeyuya/actions-mention-to-slack@v2
               with:
                   repo-token: ${{ secrets.GITHUB_TOKEN }}
+                  configuration-path: .github/mention-to-slack.yml
                   slack-webhook-url: ${{ secrets.SLACK_WEBHOOK_URL }}
                   icon-url: https://img.icons8.com/color/256/000000/github-2.png
                   bot-name: "GitHub Bot"
