@@ -26,6 +26,8 @@ jobs:
     steps:
     # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
     - uses: actions/checkout@v2
+      
+    - name: update latest code
       run: git pull origin {{github.head_ref}}
     
     - name: Prerequeist 
