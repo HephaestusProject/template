@@ -1,4 +1,4 @@
-# base
+# template
 [![Code Coverage](https://codecov.io/gh/HephaestusProject/template/branch/master/graph/badge.svg)](https://codecov.io/gh/HephaestusProject/template)
 ## Abstract
 - abstract를 번역해서 넣어주세요.

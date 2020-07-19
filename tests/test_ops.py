@@ -1,10 +1,4 @@
-import os
-import sys
-
-import pytest
-
-sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
-from lib.operation import add, multiply, subtract
+from src.model.ops import multiply, add, subtract
 
 
 def test_multiply():
