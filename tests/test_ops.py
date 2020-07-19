@@ -1,5 +1,6 @@
 import pytest
-from src.model.ops import multiply, add, subtract
+
+from src.model.ops import add, multiply, subtract
 
 
 def test_multiply():
