@@ -1,3 +1,5 @@
+import pytest
+
 from src.model.ops import add, multiply, subtract
 
 
