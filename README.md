@@ -5,7 +5,7 @@
 
 ## Abstract
 
-* abstract를 번역해서 넣어주세요.
+* abstract의 내용을 넣어주세요.
 
 ## Table
 
