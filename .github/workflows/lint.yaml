@@ -47,7 +47,7 @@ jobs:
               uses: ad-m/github-push-action@master
               with:
                   github_token: ${{ secrets.GITHUB_TOKEN }}
-                  branch: ${{ github.head_ref }}
+                  branch: ${{ github.event.push.head.sha }}
 
             - name: Slack-Notification
               uses: 8398a7/action-slack@v3
