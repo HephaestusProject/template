@@ -41,11 +41,9 @@ jobs:
             - name: commit
               run: |
                   git config --local user.email "action@github.com"
-                  git config --local user.name "GitHub Action"
-                  git add .
-                  git commit -m "style: isort/black"
+                  git config --local user.name "GitHub Action"                                    
+                  git add -A && git diff-index --cached --quiet HEAD || git commit -m 'style: isort/black'
                   git push
-            #      git add -A && git diff-index --cached --quiet HEAD || git commit -m 'style: isort/black'
 
             #- name: push
             #  uses: ad-m/github-push-action@master
