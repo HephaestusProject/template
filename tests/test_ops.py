@@ -1,7 +1,6 @@
-import torch
 import pytest
-
 import pytorch_lightning
+import torch
 
 from src.model.ops import add, multiply, subtract
 
