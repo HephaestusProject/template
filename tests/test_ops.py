@@ -13,7 +13,6 @@ def fix_seed():
 
 
 def test_multiply(fix_seed):
-    import pdb; pdb.set_trace()
     result = multiply(2, 3)
     assert result == 6
 
