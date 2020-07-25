@@ -30,6 +30,7 @@ jobs:
 
             - name: Prerequeist
               run: |
+                  pip3 install --upgrade pip setuptools
                   pip3 install pytest pytest-cov --no-cache --user
                   pip3 install -r requirements.txt --user
 
