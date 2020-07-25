@@ -22,6 +22,7 @@ jobs:
             # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
             - uses: actions/checkout@v2
               with:
+                  fetch-depth: 0
                   ref: ${{ github.BRANCH }}
 
             - name: Prerequeist
@@ -41,13 +42,16 @@ jobs:
               run: |
                   git config --local user.email "action@github.com"
                   git config --local user.name "GitHub Action"
-                  git add -A && git diff-index --cached --quiet HEAD || git commit -m 'style: isort/black'
+                  git add .
+                  git commit -m "style: isort/black"
+                  git push
+            #      git add -A && git diff-index --cached --quiet HEAD || git commit -m 'style: isort/black'
 
-            - name: push
-              uses: ad-m/github-push-action@master
-              with:
-                  github_token: ${{ secrets.GITHUB_TOKEN }}
-                  branch: ${{ github.BRANCH.head.sha }}
+            #- name: push
+            #  uses: ad-m/github-push-action@master
+            #  with:
+            #      github_token: ${{ secrets.GITHUB_TOKEN }}
+            #      branch: ${{ github.BRANCH.head }}
 
             - name: Slack-Notification
               uses: 8398a7/action-slack@v3
