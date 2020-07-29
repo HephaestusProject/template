@@ -29,7 +29,7 @@ jobs:
                   fetch-depth: 0
                   ref: ${{ github.BRANCH }}
 
-            - name: Prerequeist
+            - name: Prerequisite
               run: |
                   pip3 install --upgrade pip setuptools
                   pip3 install black --no-cache --user
