@@ -6,9 +6,10 @@ name: Lint
 # events but only for the master branch
 on: 
   push:
-    - master
-    - feature*
-    - hotfix*
+    branches:
+      - master
+      - feature/*
+      - hotfix/*
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -33,8 +34,7 @@ jobs:
               run: |
                   pip3 install --upgrade pip setuptools
                   pip3 install black --no-cache --user
-                  pip3 install isort --no-cache --user                  
-                  pip3 install -r requirements.txt --user
+                  pip3 install isort --no-cache --user
 
             - name: apply isort
               run: python3 -m isort .
