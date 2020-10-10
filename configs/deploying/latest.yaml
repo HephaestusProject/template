@@ -1,0 +1,7 @@
+username: dreamgonfly
+registry: docker.pkg.github.com
+owner: hephaestusproject
+repository: template
+image_name: mnist-server
+app_label: mnist
+helm_release_name: mnist
