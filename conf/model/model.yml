@@ -1,0 +1,72 @@
+model:
+  type: LeNet
+
+  params:
+    width: 32
+    height: 32
+    channels: &in_channels 1
+    classes: &out_features 10
+
+    feature_layers:
+      conv:
+        - in_channels: *in_channels
+          out_channels: 6
+          kernel_size: 5
+          stride: 1
+          padding: 0
+          bias: true
+          padding_mode: zeros
+          activation:
+            type: Tanh
+            args: {}
+          pool:
+            type: AvgPool2d
+            args:
+              kernel_size: [2, 2]
+              padding: 0
+
+        - in_channels: 6
+          out_channels: 16
+          kernel_size: 5
+          stride: 1
+          padding: 0
+          bias: true
+          padding_mode: zeros
+          activation:
+            type: Tanh
+            args: {}
+          pool:
+            type: AvgPool2d
+            args:
+              kernel_size: [2, 2]
+              padding: 0
+
+        - in_channels: 16
+          out_channels: 120
+          kernel_size: 5
+          stride: 1
+          padding: 0
+          bias: true
+          padding_mode: zeros
+          activation:
+            type: Tanh
+            args: {}
+          pool: null
+
+      linear:
+        - in_features: 120
+          out_features: 84
+          bias: true
+          activation:
+            type: Tanh
+            args: {}
+
+        - in_features: 84
+          out_features: *out_features
+          bias: true
+          activation: null
+
+    output_layer:
+      type: Softmax
+      args:
+        dim: 1

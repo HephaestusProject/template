@@ -1,0 +1,43 @@
+runner:
+  type: Runner
+
+  dataloader:
+    type: DataLoader
+    params:
+      num_workers: 48
+      batch_size: 256
+
+  optimizer:
+    type: Adam
+    params:
+      lr: 1e-3
+
+  trainer:
+    type: Trainer
+    params:
+      max_epochs: 15
+      gpus: -1
+      distributed_backend: ddp
+      fast_dev_run: false
+      amp_level: "02"
+      row_log_interval: 10
+      weights_summary: top
+      reload_dataloaders_every_epoch: false
+      resume_from_checkpoint: null
+      benchmark: false
+      deterministic: true
+      num_sanity_val_steps: 5
+      overfit_batches: 0.0
+      precision: 32
+      profiler: true
+
+  earlystopping:
+    type: EarlyStopping
+    params:
+      mode: max
+      patience: 10
+      verbose: True
+
+  experiments:
+    name: LeNet
+    output_dir: output/

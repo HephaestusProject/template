@@ -1,0 +1,10 @@
+# writing configuration of your dataset.
+
+dataset:
+  type: MNIST
+  params:
+    root: data/
+    train: null
+    transform: null
+    target_transform: null
+    download: true
