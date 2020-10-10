@@ -15,20 +15,28 @@ from typing import Dict, List, Tuple, Union
 import torchvision.transforms as transforms
 from omegaconf import DictConfig, OmegaConf
 from pytorch_lightning import Trainer, seed_everything
-from pytorch_lightning.callbacks import (Callback, LearningRateLogger,
-                                         ModelCheckpoint)
+from pytorch_lightning.callbacks import Callback, LearningRateLogger, ModelCheckpoint
 from torch.utils.data import DataLoader
 
 from src.model import net as Net
 from src.runner.runner import Runner
+
 # from src.runner.runner import Runner
-from src.utils import (get_checkpoint_callback, get_config, get_data_loaders,
-                       get_early_stopper, get_log_dir, get_next_version,
-                       load_class)
+from src.utils import (
+    get_checkpoint_callback,
+    get_config,
+    get_data_loaders,
+    get_early_stopper,
+    get_log_dir,
+    get_next_version,
+    load_class,
+)
 
 
 def build_model(model_conf: DictConfig):
-    return load_class(module=Net, name=model_conf.type, args={"model_config": model_conf})
+    return load_class(
+        module=Net, name=model_conf.type, args={"model_config": model_conf}
+    )
 
 
 def train(hparams: dict):
@@ -68,5 +76,7 @@ def train(hparams: dict):
         profiler=True,
     )
     trainer.fit(
-        model=runner, train_dataloader=train_dataloader, val_dataloaders=test_dataloader,
+        model=runner,
+        train_dataloader=train_dataloader,
+        val_dataloaders=test_dataloader,
     )
