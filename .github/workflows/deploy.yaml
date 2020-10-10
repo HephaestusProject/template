@@ -1,0 +1,133 @@
+name: Build, Publish, and Deploy
+
+on:
+  push:
+    branches:
+    - master
+
+env:
+  IMAGE_TAG: ${{ github.sha }}
+  GKE_CLUSTER: monthly-deeplearning-cluster
+  GKE_ZONE: us-west1-a
+
+jobs:
+  build-publish-deploy:
+    name: Build, Publish, and Deploy
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Extract branch name
+      id: extract_branch
+      shell: bash
+      run: |
+        branch_name=${GITHUB_REF#refs/heads/}
+        if [ $branch_name = "master" ]
+        then
+          env_name=latest;
+        else
+          env_name=${branch_name#env/};
+        fi
+        echo "##[set-output name=env_name;]$env_name"
+      
+    - name: Checkout
+      uses: actions/checkout@v2
+    
+    - name: Extract deploying config
+      id: extract_config
+      env:
+        CONFIG_PATH: configs/deploying/${{ steps.extract_branch.outputs.env_name }}.yaml
+      run: |
+        # Convert yaml to json
+        config=`python -c 'import sys, yaml, json; json.dump(yaml.load(sys.stdin), sys.stdout, indent=4)' < $CONFIG_PATH`
+        
+        username=`echo $(jq -r '.username' <<< "$config")`
+        registry=`echo $(jq -r '.registry' <<< "$config")`
+        owner=`echo $(jq -r '.owner' <<< "$config")`
+        repository=`echo $(jq -r '.repository' <<< "$config")`
+        image_name=`echo $(jq -r '.image_name' <<< "$config")`
+        helm_release_name=`echo $(jq -r '.helm_release_name' <<< "$config")`
+
+        echo "##[set-output name=username;]$username"
+        echo "##[set-output name=registry;]$registry"
+        echo "##[set-output name=owner;]$owner"
+        echo "##[set-output name=repository;]$repository"
+        echo "##[set-output name=image_name;]$image_name"
+        echo "##[set-output name=helm_release_name;]$helm_release_name"
+    
+    - name: Login to Github Package
+      env:
+        REGISTRY: ${{ steps.extract_config.outputs.registry }}
+        USERNAME: ${{ steps.extract_config.outputs.username }}
+        PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        docker login $REGISTRY -u $USERNAME --password $PASSWORD
+
+    - name: Build Image
+      id: build-image
+      env:
+        ENVIRONMENT: ${{ steps.extract_branch.outputs.env_name }}
+        REGISTRY: ${{ steps.extract_config.outputs.registry }}
+        OWNER: ${{ steps.extract_config.outputs.owner }}
+        REPOSITORY: ${{ steps.extract_config.outputs.repository }}
+        IMAGE_NAME: ${{ steps.extract_config.outputs.image_name }}
+      run: |
+        docker pull $REGISTRY/$OWNER/$REPOSITORY/$IMAGE_NAME:$ENVIRONMENT || true
+        docker build . --file charlm-server.Dockerfile --tag $REGISTRY/$OWNER/$REPOSITORY/$IMAGE_NAME:$IMAGE_TAG \
+          --cache-from $REGISTRY/$OWNER/$REPOSITORY/$IMAGE_NAME:$ENVIRONMENT
+        echo "::set-output name=image_name::$REGISTRY/$OWNER/$REPOSITORY/$IMAGE_NAME:$IMAGE_TAG"
+
+    - name: Test Image
+      id: test-image
+      env:
+        ENVIRONMENT: ${{ steps.extract_branch.outputs.env_name }}
+        REGISTRY: ${{ steps.extract_config.outputs.registry }}
+        OWNER: ${{ steps.extract_config.outputs.owner }}
+        REPOSITORY: ${{ steps.extract_config.outputs.repository }}
+        IMAGE_NAME: ${{ steps.extract_config.outputs.image_name }}
+      run: |
+        CONTAINER_ID=$(docker run -d --rm --env ENVIRONMENT $REGISTRY/$OWNER/$REPOSITORY/$IMAGE_NAME:$IMAGE_TAG)
+        docker exec $CONTAINER_ID pytest
+
+    - name: Publish
+      env:
+        ENVIRONMENT: ${{ steps.extract_branch.outputs.env_name }}
+        REGISTRY: ${{ steps.extract_config.outputs.registry }}
+        OWNER: ${{ steps.extract_config.outputs.owner }}
+        REPOSITORY: ${{ steps.extract_config.outputs.repository }}
+        IMAGE_NAME: ${{ steps.extract_config.outputs.image_name }}
+      run: |
+        docker push $REGISTRY/$OWNER/$REPOSITORY/$IMAGE_NAME:$IMAGE_TAG
+        # For caching
+        docker tag $REGISTRY/$OWNER/$REPOSITORY/$IMAGE_NAME:$IMAGE_TAG $REGISTRY/$OWNER/$REPOSITORY/$IMAGE_NAME:$ENVIRONMENT
+        docker push $REGISTRY/$OWNER/$REPOSITORY/$IMAGE_NAME:$ENVIRONMENT
+
+    - name: Setup gcloud
+      uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
+      with:
+        version: '290.0.1'
+        service_account_key: ${{ secrets.GKE_SA_KEY }}
+        project_id: monthly-deeplearning
+
+    - name: Configure docker to use the gcloud command-line tool as a credential helper for authentication
+      run: |
+        gcloud --quiet auth configure-docker
+
+    - name: Get the GKE credentials so we can deploy to the cluster
+      run: |
+        gcloud container clusters get-credentials "$GKE_CLUSTER" --zone "$GKE_ZONE"
+
+    - name: Install Helm
+      run: |
+        curl https://helm.baltorepo.com/organization/signing.asc | sudo apt-key add -
+        sudo apt-get install apt-transport-https --yes
+        echo "deb https://baltocdn.com/helm/stable/debian/ all main" | sudo tee /etc/apt/sources.list.d/helm-stable-debian.list
+        sudo apt-get update
+        sudo apt-get install helm
+
+    - name: Deploy Helm
+      env:
+        ENVIRONMENT: ${{ steps.extract_branch.outputs.env_name }}
+        HELM_RELEASE_NAME: ${{ steps.extract_config.outputs.helm_release_name }}
+      run: |
+        helm upgrade $HELM_RELEASE_NAME ./deploying/helm --install --wait --atomic --namespace=$ENVIRONMENT \
+          --set=environment=$ENVIRONMENT --set=image_tag=$IMAGE_TAG --values=configs/deploying/$ENVIRONMENT.yaml

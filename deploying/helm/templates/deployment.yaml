@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.app_label }}-deployment
+  labels:
+    app: {{ .Values.app_label }}
+    environment: {{ .Values.environment }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Values.app_label }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.app_label }}
+    spec:
+      containers:
+        - name: pg
+          image: "{{ .Values.registry }}/{{ .Values.owner }}/{{ .Values.repository }}/{{ .Values.image_name }}:{{ .Values.image_tag }}"
+          env:
+            - name: ENVIRONMENT
+              value: {{ .Values.environment }}
+          ports:
+            - containerPort: 8000
+              protocol: TCP
+          readinessProbe:
+            httpGet:
+              path: /hello
+              port: 8000
+            initialDelaySeconds: 3
+            periodSeconds: 15
+      imagePullSecrets:
+        - name: regcred
