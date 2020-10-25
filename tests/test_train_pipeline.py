@@ -32,4 +32,6 @@ def test_train_pipeline(fix_seed, tearup_config):
         profiler=True,
     )
 
-    trainer.fit(model=runner, train_dataloader=train_dataloader, val_dataloaders=test_dataloader)
+    trainer.fit(
+        model=runner, train_dataloader=train_dataloader, val_dataloaders=test_dataloader
+    )
