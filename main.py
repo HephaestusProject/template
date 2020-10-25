@@ -12,6 +12,7 @@ Options:
     -h --help     Show this.
 See 'python main.py <command> --help' for more information on a specific command.
 """
+import subprocess
 from pathlib import Path
 
 from type_docopt import docopt
@@ -29,6 +30,9 @@ if __name__ == "__main__":
         from predict import __doc__, predict
 
         predict(docopt(__doc__, argv=argv, types={"path": Path}))
+
+    elif args["<command>"] == "test":
+        subprocess.run(["pytest", "tests/"])
 
     else:
         raise NotImplementedError(f"Command does not exist: {args['<command>']}")
