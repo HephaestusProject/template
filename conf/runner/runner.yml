@@ -15,8 +15,8 @@ runner:
   trainer:
     type: Trainer
     params:
-      max_epochs: 15
-      gpus: -1
+      max_epochs: 3
+      gpus: null
       distributed_backend: ddp
       fast_dev_run: false
       amp_level: "02"

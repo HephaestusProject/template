@@ -9,9 +9,17 @@ import numpy as np
 import torchvision
 import torchvision.transforms as transforms
 from omegaconf import DictConfig, OmegaConf
-from pytorch_lightning.callbacks import (Callback, EarlyStopping,
-                                         LearningRateLogger, ModelCheckpoint)
+from pytorch_lightning.callbacks import Callback, EarlyStopping, LearningRateLogger, ModelCheckpoint
 from torch.utils.data import DataLoader
+from src.model import net as Net
+
+
+def load_class(module: Any, name: str, args: Dict):
+    return getattr(module, name)(**args)
+
+
+def build_model(model_conf: DictConfig):
+    return getattr(Net, model_conf.type)(**{"model_config": model_conf})
 
 
 def get_next_version(root_dir: Path):

@@ -17,10 +17,10 @@ model:
           bias: true
           padding_mode: zeros
           activation:
-            type: Tanh
+            type: ReLU
             args: {}
           pool:
-            type: AvgPool2d
+            type: MaxPool2d
             args:
               kernel_size: [2, 2]
               padding: 0
@@ -33,32 +33,27 @@ model:
           bias: true
           padding_mode: zeros
           activation:
-            type: Tanh
+            type: ReLU
             args: {}
           pool:
-            type: AvgPool2d
+            type: MaxPool2d
             args:
               kernel_size: [2, 2]
               padding: 0
 
-        - in_channels: 16
-          out_channels: 120
-          kernel_size: 5
-          stride: 1
-          padding: 0
-          bias: true
-          padding_mode: zeros
-          activation:
-            type: Tanh
-            args: {}
-          pool: null
-
       linear:
+        - in_features: 400
+          out_features: 120
+          bias: true
+          activation:
+            type: ReLU
+            args: {}
+
         - in_features: 120
           out_features: 84
           bias: true
           activation:
-            type: Tanh
+            type: ReLU
             args: {}
 
         - in_features: 84

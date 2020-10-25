@@ -1,7 +1,3 @@
-"""
-    To implement code of your network using operation from ops.py.
-"""
-
 import copy
 from typing import Dict, List, Optional
 
@@ -9,8 +5,6 @@ import torch
 import torch.nn as nn
 from omegaconf import DictConfig, OmegaConf
 from torchsummary import summary as torch_summary
-
-from src.utils import load_class
 
 
 class LinearBlock(nn.Module):
@@ -134,10 +128,13 @@ def _build_conv_layers(conv_layers_config: DictConfig) -> torch.nn.ModuleList:
 
 
 def _build_output_layer(output_layer_config) -> torch.nn.Module:
-    return load_class(module=nn, name=output_layer_config["type"], args=output_layer_config["args"])
+    return getattr(nn, output_layer_config["type"])(**output_layer_config["args"])
 
 
 class LeNet(nn.Module):
+
+    CLASS_MAP = {0: "0", 1: "1", 2: "2", 3: "3", 4: "4", 5: "5", 6: "6", 7: "7", 8: "8", 9: "9"}
+
     def __init__(self, model_config: DictConfig) -> None:
         """[summary]
 
@@ -182,6 +179,13 @@ class LeNet(nn.Module):
 
     def loss(self, x, y):
         return self.loss_fn(x, y)
+
+    def inference(self, x: torch.Tensor):
+        outputs = self.forward(x).to("cpu")
+        indices = int(torch.topk(outputs, 1).indices.squeeze().numpy())
+        prediction = self.CLASS_MAP[indices]
+
+        return prediction
 
     def summary(self):
         # torchsummary only supported [cuda, cpu]. not cuda:0

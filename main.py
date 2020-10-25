@@ -25,5 +25,10 @@ if __name__ == "__main__":
 
         train(docopt(__doc__, argv=argv, types={"path": Path}))
 
+    elif args["<command>"] == "predict":
+        from predict import __doc__, predict
+
+        predict(docopt(__doc__, argv=argv, types={"path": Path}))
+
     else:
         raise NotImplementedError(f"Command does not exist: {args['<command>']}")
