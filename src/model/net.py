@@ -25,7 +25,9 @@ class LinearBlock(nn.Module):
         """
         super(LinearBlock, self).__init__()
 
-        self.linear = nn.Linear(in_features=in_features, out_features=out_features, bias=bias)
+        self.linear = nn.Linear(
+            in_features=in_features, out_features=out_features, bias=bias
+        )
 
         self.activation = activation
         if self.activation:
@@ -133,7 +135,18 @@ def _build_output_layer(output_layer_config) -> torch.nn.Module:
 
 class LeNet(nn.Module):
 
-    CLASS_MAP = {0: "0", 1: "1", 2: "2", 3: "3", 4: "4", 5: "5", 6: "6", 7: "7", 8: "8", 9: "9"}
+    CLASS_MAP = {
+        0: "0",
+        1: "1",
+        2: "2",
+        3: "3",
+        4: "4",
+        5: "5",
+        6: "6",
+        7: "7",
+        8: "8",
+        9: "9",
+    }
 
     def __init__(self, model_config: DictConfig) -> None:
         """[summary]
@@ -191,7 +204,9 @@ class LeNet(nn.Module):
         # torchsummary only supported [cuda, cpu]. not cuda:0
         device = str(self.device).split(":")[0]
         torch_summary(
-            self, input_size=(self._channels, self._height, self._width), device=device,
+            self,
+            input_size=(self._channels, self._height, self._width),
+            device=device,
         )
 
     @property
@@ -201,6 +216,8 @@ class LeNet(nn.Module):
         }
         if len(devices) != 1:
             raise RuntimeError(
-                "Cannot determine device: {} different devices found".format(len(devices))
+                "Cannot determine device: {} different devices found".format(
+                    len(devices)
+                )
             )
         return next(iter(devices))

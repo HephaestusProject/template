@@ -1,9 +1,9 @@
+from pathlib import Path
+
 import torch
 import torchvision
-
-from pathlib import Path
-from PIL import Image
 from omegaconf import DictConfig
+from PIL import Image
 
 from src.utils import build_model
 
@@ -23,4 +23,3 @@ class Predictor(object):
     def preprocess(self, image: Image):
         resize_image = torchvision.transforms.Resize((32, 32))(image)
         return torchvision.transforms.ToTensor()(resize_image).unsqueeze(0)
-

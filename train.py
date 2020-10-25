@@ -20,8 +20,8 @@ from torch.utils.data import DataLoader
 
 from src.model import net as Net
 from src.runner.runner import Runner
-
 from src.utils import (
+    build_model,
     get_checkpoint_callback,
     get_config,
     get_data_loaders,
@@ -29,7 +29,6 @@ from src.utils import (
     get_log_dir,
     get_next_version,
     load_class,
-    build_model,
 )
 
 
@@ -71,5 +70,7 @@ def train(hparams: dict):
         profiler=True,
     )
     trainer.fit(
-        model=runner, train_dataloader=train_dataloader, val_dataloaders=test_dataloader,
+        model=runner,
+        train_dataloader=train_dataloader,
+        val_dataloaders=test_dataloader,
     )
