@@ -10,9 +10,11 @@ Options:
     
     -h --help  Show this.
 """
-from typing import Dict
 from pathlib import Path
+from typing import Dict
+
 from PIL import Image
+
 from src.engine.predictor import Predictor
 from src.utils import get_config
 
