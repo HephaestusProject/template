@@ -1,6 +1,3 @@
-"""    
-    To implement code for utility.
-"""
 import json
 from pathlib import Path
 from typing import Any, Dict, List, Tuple, Union
@@ -12,7 +9,6 @@ from omegaconf import DictConfig, OmegaConf
 from pytorch_lightning.callbacks import (
     Callback,
     EarlyStopping,
-    LearningRateLogger,
     ModelCheckpoint,
 )
 from torch.utils.data import DataLoader
@@ -86,9 +82,7 @@ def get_log_dir(config: DictConfig) -> Path:
     Returns:
         Path: [description]
     """
-    root_dir = Path(config.runner.experiments.output_dir) / Path(
-        config.runner.experiments.name
-    )
+    root_dir = Path(config.runner.experiments.output_dir) / Path(config.runner.experiments.name)
     next_version = get_next_version(root_dir)
     run_dir = root_dir.joinpath(next_version)
 
@@ -104,9 +98,7 @@ def get_early_stopper(early_stopping_config: DictConfig):
     )
 
 
-def get_checkpoint_callback(
-    log_dir: Path, config: DictConfig
-) -> Union[Callback, List[Callback]]:
+def get_checkpoint_callback(log_dir: Path, config: DictConfig) -> Union[Callback, List[Callback]]:
     """[summary]
 
     Args:
@@ -117,13 +109,16 @@ def get_checkpoint_callback(
         Union[Callback, List[Callback]]: [description]
     """
     checkpoint_prefix = f"{config.model.type}"
-    checkpoint_suffix = (
-        "_{epoch:02d}-{train_loss:.2f}-{val_loss:.2f}-{train_acc:.2f}-{val_acc:.2f}"
-    )
+    checkpoint_suffix = "_{epoch:02d}-{train_loss:.2f}-{val_loss:.2f}-{train_acc:.2f}-{val_acc:.2f}"
 
     checkpoint_path = log_dir.joinpath(checkpoint_prefix + checkpoint_suffix)
     checkpoint_callback = ModelCheckpoint(
-        filepath=checkpoint_path, save_top_k=2, save_weights_only=True
+        filepath=checkpoint_path,
+        save_weights_only=True,
+        verbose=True,
+        save_last=True,
+        monitor="val_loss",
+        mode="max",
     )
 
     return checkpoint_callback
@@ -144,9 +139,7 @@ def get_data_loaders(config: DictConfig) -> Tuple[DataLoader, DataLoader]:
     args["transform"] = transforms.Compose(
         [transforms.Resize(size=(32, 32)), transforms.ToTensor()]
     )
-    train_dataset = load_class(
-        module=torchvision.datasets, name=config.dataset.type, args=args
-    )
+    train_dataset = load_class(module=torchvision.datasets, name=config.dataset.type, args=args)
 
     train_dataloader = DataLoader(
         dataset=train_dataset,
@@ -158,9 +151,7 @@ def get_data_loaders(config: DictConfig) -> Tuple[DataLoader, DataLoader]:
 
     args["train"] = False
 
-    test_dataset = load_class(
-        module=torchvision.datasets, name=config.dataset.type, args=args
-    )
+    test_dataset = load_class(module=torchvision.datasets, name=config.dataset.type, args=args)
     test_dataloader = DataLoader(
         dataset=test_dataset,
         batch_size=config.runner.dataloader.params.batch_size,

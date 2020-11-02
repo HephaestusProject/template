@@ -1,9 +1,10 @@
 torch==1.6.0
 torchvision==0.6.0 
-pytorch-lightning==0.9.1rc4
+pytorch-lightning==1.0.4
 omegaconf==2.0.1rc11
 type-docopt==0.1.0
 isort==5.4.0
 black==19.10b0
 wandb==0.9.4
 torchsummary==1.5.1
+scikit-learn==0.23.2

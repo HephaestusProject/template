@@ -45,35 +45,15 @@ class Runner(LightningModule):
         x, y = batch
         _, loss, acc = self._comm_step(x, y)
 
-        result = pl.TrainResult(loss)
-        result.log(name="train_loss", value=loss)
-        result.log_dict(
-            {"train_loss": loss, "train_acc": acc},
-            prog_bar=True,
-            logger=True,
-            on_step=False,
-            on_epoch=True,
-            sync_dist=True,
-        )
-        return result
+        self.log("train_loss", loss, on_step=True, on_epoch=True, prog_bar=True, logger=True)
+        self.log("train_acc", acc, on_step=True, on_epoch=True, prog_bar=True, logger=True)
+
+        return loss
 
     def validation_step(self, batch, batch_idx):
         x, y = batch
         _, loss, acc = self._comm_step(x, y)
+        self.log("val_loss", acc, on_step=True, on_epoch=True, prog_bar=True, logger=True)
+        self.log("val_acc", acc, on_step=True, on_epoch=True, prog_bar=True, logger=True)
+        return {"val_loss": loss, "val_acc": acc}
 
-        result = pl.EvalResult(checkpoint_on=acc)
-        result.log_dict(
-            {"val_loss": loss, "val_acc": acc},
-            prog_bar=True,
-            logger=True,
-            on_step=False,
-            on_epoch=True,
-            sync_dist=True,
-        )
-
-        return result
-
-    def test_step(self, batch, batch_idx):
-        result = self.validation_step(batch, batch_idx)
-        result.rename_keys({"val_loss": "loss", "val_acc": "acc"})
-        return result

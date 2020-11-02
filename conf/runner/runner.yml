@@ -15,7 +15,7 @@ runner:
   trainer:
     type: Trainer
     params:
-      max_epochs: 3
+      max_epochs: 10
       gpus: null
       distributed_backend: ddp
       fast_dev_run: false
@@ -34,6 +34,7 @@ runner:
   earlystopping:
     type: EarlyStopping
     params:
+      monitor: "val_acc"
       mode: max
       patience: 10
       verbose: True

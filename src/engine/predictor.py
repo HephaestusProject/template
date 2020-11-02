@@ -8,14 +8,10 @@ from PIL import Image
 from src.utils import build_model
 
 
-class Predictor(object):
-    def __init__(self, model_conf: DictConfig, weight_filepath: Path):
+class Predictor(torch.nn.Module):
+    def __init__(self, model_conf: DictConfig):
+        super().__init__()
         self.model = build_model(model_conf=model_conf)
-
-        if not weight_filepath.exists():
-            raise RuntimeError(f"{str(weight_filepath)} not exist")
-
-        self.model.load_state_dict(torch.load(str(weight_filepath)), strict=False)
 
     def __call__(self, x: torch.Tensor):
         return self.model.inference(x)

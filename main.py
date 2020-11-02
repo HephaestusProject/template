@@ -31,6 +31,11 @@ if __name__ == "__main__":
 
         predict(docopt(__doc__, argv=argv, types={"path": Path}))
 
+    elif args["<command>"] == "evaluate":
+        from evaluate import __doc__, evaluate
+
+        evaluate(docopt(__doc__, argv=argv, types={"path": Path}))
+
     elif args["<command>"] == "test":
         subprocess.run(["pytest", "tests/"])
 

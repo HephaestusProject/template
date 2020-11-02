@@ -15,7 +15,7 @@ from typing import Dict, List, Tuple, Union
 import torchvision.transforms as transforms
 from omegaconf import DictConfig, OmegaConf
 from pytorch_lightning import Trainer, seed_everything
-from pytorch_lightning.callbacks import Callback, LearningRateLogger, ModelCheckpoint
+from pytorch_lightning.callbacks import Callback, ModelCheckpoint
 from torch.utils.data import DataLoader
 
 from src.model import net as Net
@@ -32,7 +32,7 @@ from src.utils import (
 )
 
 
-def train(hparams: dict):
+def train(hparams: Dict):
     config_list: List = ["--dataset-config", "--model-config", "--runner-config"]
     config: DictConfig = get_config(hparams=hparams, options=config_list)
 
@@ -41,7 +41,6 @@ def train(hparams: dict):
 
     checkpoint_callback = get_checkpoint_callback(log_dir=log_dir, config=config)
 
-    lr_logger = LearningRateLogger()
     early_stop_callback = get_early_stopper(
         early_stopping_config=config.runner.earlystopping.params
     )
@@ -51,12 +50,10 @@ def train(hparams: dict):
 
     runner = Runner(model=model, config=config.runner)
     trainer = Trainer(
-        distributed_backend=config.runner.trainer.distributed_backend,
+        accelerator=config.runner.trainer.distributed_backend,
         fast_dev_run=False,
         gpus=config.runner.trainer.params.gpus,
         amp_level="O2",
-        row_log_interval=10,
-        callbacks=[lr_logger],
         checkpoint_callback=checkpoint_callback,
         max_epochs=config.runner.trainer.params.max_epochs,
         weights_summary="top",
@@ -70,7 +67,5 @@ def train(hparams: dict):
         profiler=True,
     )
     trainer.fit(
-        model=runner,
-        train_dataloader=train_dataloader,
-        val_dataloaders=test_dataloader,
+        model=runner, train_dataloader=train_dataloader, val_dataloaders=test_dataloader,
     )
