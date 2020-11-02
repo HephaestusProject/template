@@ -30,7 +30,9 @@ def evaluate(hparams: dict):
     _, test_dataloader = get_data_loaders(config=config)
 
     predictor = Predictor(model_conf=config.model)
-    predictor.load_state_dict(torch.load(str(weight_filepath))["state_dict"], strict=True)
+    predictor.load_state_dict(
+        torch.load(str(weight_filepath))["state_dict"], strict=True
+    )
     predictor.eval()
 
     y_hat = []

@@ -10,11 +10,10 @@ Options:
     
     -h --help  Show this.
 """
-import torch
-
 from pathlib import Path
 from typing import Dict
 
+import torch
 from PIL import Image
 
 from src.engine.predictor import Predictor
@@ -30,7 +29,9 @@ def predict(hparams: Dict):
     image_filepath = hparams.get("--image_filepath")
 
     predictor = Predictor(model_conf=config.model)
-    predictor.load_state_dict(torch.load(str(weight_filepath))["state_dict"], strict=True)
+    predictor.load_state_dict(
+        torch.load(str(weight_filepath))["state_dict"], strict=True
+    )
     predictor.eval()
 
     image = Image.open(str(image_filepath))
