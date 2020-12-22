@@ -53,7 +53,7 @@ class Runner(LightningModule):
     def validation_step(self, batch, batch_idx):
         x, y = batch
         _, loss, acc = self._comm_step(x, y)
-        self.log("val_loss", acc, on_step=True, on_epoch=True, prog_bar=True, logger=True)
+        self.log("val_loss", loss, on_step=True, on_epoch=True, prog_bar=True, logger=True)
         self.log("val_acc", acc, on_step=True, on_epoch=True, prog_bar=True, logger=True)
         return {"val_loss": loss, "val_acc": acc}
 

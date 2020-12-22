@@ -54,6 +54,7 @@ def train(hparams: Dict):
         fast_dev_run=False,
         gpus=config.runner.trainer.params.gpus,
         amp_level="O2",
+        callbacks=[early_stop_callback],
         checkpoint_callback=checkpoint_callback,
         max_epochs=config.runner.trainer.params.max_epochs,
         weights_summary="top",
