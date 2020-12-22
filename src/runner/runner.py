@@ -45,8 +45,12 @@ class Runner(LightningModule):
         x, y = batch
         _, loss, acc = self._comm_step(x, y)
 
-        self.log("train_loss", loss, on_step=True, on_epoch=True, prog_bar=True, logger=True)
-        self.log("train_acc", acc, on_step=True, on_epoch=True, prog_bar=True, logger=True)
+        self.log(
+            "train_loss", loss, on_step=True, on_epoch=True, prog_bar=True, logger=True
+        )
+        self.log(
+            "train_acc", acc, on_step=True, on_epoch=True, prog_bar=True, logger=True
+        )
 
         return loss
 
@@ -55,5 +59,5 @@ class Runner(LightningModule):
         _, loss, acc = self._comm_step(x, y)
         self.log("val_loss", loss, on_step=True, on_epoch=True, prog_bar=True, logger=True)
         self.log("val_acc", acc, on_step=True, on_epoch=True, prog_bar=True, logger=True)
-        return {"val_loss": loss, "val_acc": acc}
 
+        return {"val_loss": loss, "val_acc": acc}

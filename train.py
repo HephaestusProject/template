@@ -68,5 +68,7 @@ def train(hparams: Dict):
         profiler=True,
     )
     trainer.fit(
-        model=runner, train_dataloader=train_dataloader, val_dataloaders=test_dataloader,
+        model=runner,
+        train_dataloader=train_dataloader,
+        val_dataloaders=test_dataloader,
     )
